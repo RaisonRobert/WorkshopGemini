@@ -3,89 +3,54 @@ package br.com.workshop.gemini
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
-import br.com.workshop.gemini.ui.theme.WorkshopGeminiTheme
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            WorkshopGeminiTheme {
-                WorkshopGeminiApp()
-            }
-        }
+        setContent { MaterialTheme { TelaGemini() } }
     }
 }
 
-@PreviewScreenSizes
 @Composable
-fun WorkshopGeminiApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+fun TelaGemini(vm: GeminiViewModel = viewModel()) {
+    // Só o texto sendo digitado fica na tela; o resto vive no ViewModel
+    var pergunta by remember { mutableStateOf("") }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            painterResource(it.icon),
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
-                )
-            }
-        }
+    Column(
+        modifier = Modifier.fillMaxSize().padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+        // 1) ÁREA DA RESPOSTA (em cima) — exibe o estado do ViewModel
+        Card(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            Column(Modifier.padding(16.dp).verticalScroll(rememberScrollState())) {
+                if (vm.carregando && vm.resposta.isEmpty()) CircularProgressIndicator()
+                else Text(vm.resposta)
+            }
         }
-    }
-}
 
-enum class AppDestinations(
-    val label: String,
-    val icon: Int,
-) {
-    HOME("Home", R.drawable.ic_home),
-    FAVORITES("Favorites", R.drawable.ic_favorite),
-    PROFILE("Profile", R.drawable.ic_account_box),
-}
+        // 2) CAMPO PARA DIGITAR
+        OutlinedTextField(
+            value = pergunta,
+            onValueChange = { pergunta = it },
+            label = { Text("Digite sua pergunta") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WorkshopGeminiTheme {
-        Greeting("Android")
+        // 3) BOTÃO PARA INICIAR — só avisa o ViewModel
+        Button(
+            onClick = { vm.perguntar(pergunta) },
+            enabled = pergunta.isNotBlank() && !vm.carregando,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(if (vm.carregando) "Pensando…" else "Perguntar ao Gemini")
+        }
     }
 }

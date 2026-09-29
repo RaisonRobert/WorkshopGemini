@@ -41,6 +41,9 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.ai)
 
+    // ViewModel no Compose (arquitetura MVVM)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
