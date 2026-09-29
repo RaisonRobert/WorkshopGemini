@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "409246841433",
+    "project_id": "workshop-gemini-17388",
+    "storage_bucket": "workshop-gemini-17388.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:409246841433:android:8d2815d6ef7a7768068f48",
+        "android_client_info": {
+          "package_name": "br.com.workshop.gemini"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOTLgVAYuJaStlS21lqJHGlgd2ShfHhDE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
